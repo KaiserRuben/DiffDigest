@@ -33,16 +33,19 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     4. If the commit change is big, provide a description in the body.
     5. If this commit is likely to have a great impact, point out its major achievements.
     6. If there is only minor refactoring, you should classify it as refactor.
-    6. Do not include any additional text, explanations, or backticks.
-
-    Here's a summary of the last few commit messages:
-    {last_commits_summary}
+    7. Do not include any additional text, explanations, or backticks.
 
     Here's the analysis of the diff:
     {diff_analysis}
 
     And here's the full git diff for reference:
     {diff}
+
+    For additional context, here's a summary of the last few commit messages:
+    {last_commits_summary}
+
+    Please focus primarily on the current diff and its analysis when generating the commit message examples. 
+    Use the last commit messages only for high-level context, but ensure the examples are specific to the current changes.
 
     Please provide your commit message examples in the following format:
     """
@@ -58,7 +61,6 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     commit_message_prompt += f"""
     Commit message examples:"""
     return call_api(url, headers, commit_message_prompt)
-
 
 def select_best_commit_message(commit_message_examples):
     url = "http://localhost:11434/api/generate"
