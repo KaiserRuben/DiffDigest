@@ -2,6 +2,7 @@ from utils.git_utils import get_git_diff, get_last_commit_messages
 from utils.api_utils import call_api
 from utils.string_shenanigans import clean_commit_message
 
+
 def analyze_diff(diff):
     url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
@@ -18,6 +19,7 @@ def analyze_diff(diff):
     Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message.
     """
     return call_api(url, headers, meta_prompt)
+
 
 def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, long=True):
     url = "http://localhost:11434/api/generate"
@@ -57,6 +59,7 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     Commit message examples:"""
     return call_api(url, headers, commit_message_prompt)
 
+
 def select_best_commit_message(commit_message_examples):
     url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
@@ -72,6 +75,7 @@ def select_best_commit_message(commit_message_examples):
 
     Selected commit message:"""
     return call_api(url, headers, selection_prompt)
+
 
 def generate_commit_message(diff, logging=True, markdown=False):
     try:

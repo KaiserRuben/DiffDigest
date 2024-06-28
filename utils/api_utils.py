@@ -1,5 +1,6 @@
 import requests
 
+
 def call_api(url, headers, prompt):
     try:
         response = requests.post(url, headers=headers, json={
