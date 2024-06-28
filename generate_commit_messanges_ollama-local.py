@@ -57,7 +57,8 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     2. Keep the summary under 50 characters.
     3. Focus on the main change and its impact.
     4. If the commit change is big, provide a description in the body.
-    5. If this commit is likely to have a big impact, point out its major achievements.
+    5. If this commit is likely to have a great impact, point out its major achievements.
+    6. If there is only minor refactoring, you should classify it as refactor.
     6. Do not include any additional text, explanations, or backticks.
 
     Here's a summary of the last few commit messages:
@@ -92,6 +93,7 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     }).json()['response'].strip()
 
     return commit_message_examples
+
 
 def select_best_commit_message(commit_message_examples):
     url = "http://localhost:11434/api/generate"
@@ -137,7 +139,8 @@ def generate_commit_message(diff, logging=True, markdown=False):
     except requests.RequestException as e:
         return f"Error: Failed to generate commit message. {str(e)}"
 
-def get_last_commit_messages(num_commits=5): # ToDo: Get Number with meta prompt
+
+def get_last_commit_messages(num_commits=5):  # ToDo: Get Number with meta prompt
     try:
         # Use the git log command to retrieve the last num_commits commit messages
         output = subprocess.check_output(["git", "log", f"--pretty=format:%s", f"-n{num_commits}"], text=True)
@@ -145,6 +148,8 @@ def get_last_commit_messages(num_commits=5): # ToDo: Get Number with meta prompt
         return "\n".join(commit_messages)
     except subprocess.CalledProcessError as e:
         return f"Error: Failed to retrieve last commit messages. {str(e)}"
+
+
 if __name__ == "__main__":
     diff = get_git_diff()
     if diff.startswith("Error"):
