@@ -53,7 +53,7 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     """
     if long:
         commit_message_prompt += f"""
-        - <type>(<optional scope>): <short summary>
+        - <type>(<optional scope>): <short summary>\n\n
         <optional body>
         """
     else:
