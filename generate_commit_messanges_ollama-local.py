@@ -46,7 +46,7 @@ def analyze_diff(diff):
     return diff_analysis
 
 
-def generate_commit_message_examples(diff_analysis, diff, long=True):
+def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, long=True):
     url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
 
@@ -54,12 +54,14 @@ def generate_commit_message_examples(diff_analysis, diff, long=True):
 
     Guidelines:
     1. Use one of these types: feat, fix, docs, style, refactor, test, chore.
-    2. Follow the format: <type>(<optional scope>): <short summary>
-    3. Keep the summary under 50 characters.
-    4. Focus on the main change and its impact.
-    5. If the commit change is big, provide a description in the body.
-    6. If this commit is likely to have a big impact, point out its major achievements.
-    5. Do not include any additional text, explanations, or backticks.
+    2. Keep the summary under 50 characters.
+    3. Focus on the main change and its impact.
+    4. If the commit change is big, provide a description in the body.
+    5. If this commit is likely to have a big impact, point out its major achievements.
+    6. Do not include any additional text, explanations, or backticks.
+
+    Here's a summary of the last few commit messages:
+    {last_commits_summary}
 
     Here's the analysis of the diff:
     {diff_analysis}
@@ -69,9 +71,11 @@ def generate_commit_message_examples(diff_analysis, diff, long=True):
 
     Please provide your commit message examples in the following format:
     """
+
     if long:
         commit_message_prompt += f"""
-        - <type>(<optional scope>): <short summary>\n<optional body>
+        - <type>(<optional scope>): <short summary>
+        <optional body>
         """
     else:
         commit_message_prompt += f"""
@@ -88,7 +92,6 @@ def generate_commit_message_examples(diff_analysis, diff, long=True):
     }).json()['response'].strip()
 
     return commit_message_examples
-
 
 def select_best_commit_message(commit_message_examples):
     url = "http://localhost:11434/api/generate"
@@ -117,10 +120,11 @@ def select_best_commit_message(commit_message_examples):
 
 def generate_commit_message(diff, logging=True, markdown=False):
     try:
-
+        last_commits_summary = get_last_commit_messages()
+        if logging: print(f"[Last Commit Messages]\n{last_commits_summary}")
         diff_analysis = analyze_diff(diff)
         if logging: print(f"[Diff Analysis]\n{diff_analysis}")
-        commit_message_examples = generate_commit_message_examples(diff_analysis, diff)
+        commit_message_examples = generate_commit_message_examples(diff_analysis, diff, last_commits_summary)
         if logging: print(f"\n[Commit Message Examples]\n{commit_message_examples}")
         selected_commit_message = select_best_commit_message(commit_message_examples)
         selected_commit_message = clean_commit_message(selected_commit_message)
@@ -133,7 +137,14 @@ def generate_commit_message(diff, logging=True, markdown=False):
     except requests.RequestException as e:
         return f"Error: Failed to generate commit message. {str(e)}"
 
-
+def get_last_commit_messages(num_commits=5): # ToDo: Get Number with meta prompt
+    try:
+        # Use the git log command to retrieve the last num_commits commit messages
+        output = subprocess.check_output(["git", "log", f"--pretty=format:%s", f"-n{num_commits}"], text=True)
+        commit_messages = output.strip().split("\n")
+        return "\n".join(commit_messages)
+    except subprocess.CalledProcessError as e:
+        return f"Error: Failed to retrieve last commit messages. {str(e)}"
 if __name__ == "__main__":
     diff = get_git_diff()
     if diff.startswith("Error"):
