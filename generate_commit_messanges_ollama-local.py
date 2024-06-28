@@ -4,6 +4,8 @@ import pyperclip
 import requests
 import re
 
+from utils.string_shenanigans import clean_commit_message
+
 
 def get_git_diff():
     try:
@@ -113,7 +115,7 @@ def select_best_commit_message(commit_message_examples):
     return selected_commit_message
 
 
-def generate_commit_message(diff, logging=True):
+def generate_commit_message(diff, logging=True, markdown=False):
     try:
 
         diff_analysis = analyze_diff(diff)
@@ -121,9 +123,10 @@ def generate_commit_message(diff, logging=True):
         commit_message_examples = generate_commit_message_examples(diff_analysis, diff)
         if logging: print(f"\n[Commit Message Examples]\n{commit_message_examples}")
         selected_commit_message = select_best_commit_message(commit_message_examples)
+        selected_commit_message = clean_commit_message(selected_commit_message)
         if logging: print(f"\n[Selected Commit Message]\n{selected_commit_message}")
         markdown_logs = f"# Diff Analysis\n{diff_analysis}\n\n# Commit Message Examples\n{commit_message_examples}\n\n# Selected Commit Message\n{selected_commit_message}"
-        if logging:
+        if markdown:
             with open("commit_message.md", "w") as f:
                 f.write(markdown_logs)
         return selected_commit_message
