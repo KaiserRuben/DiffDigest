@@ -1,10 +1,10 @@
-from utils.git_utils import get_git_diff, get_last_commit_messages
+from utils.git_utils import get_last_commit_messages
 from utils.api_utils import call_api
 from utils.string_shenanigans import clean_commit_message
+import config
 
 
 def analyze_diff(diff):
-    url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
     meta_prompt = f"""You are an AI assistant skilled in analyzing git diffs and providing context for commit message generation.
     Please analyze the following git diff and provide a summary of the changes, including:
@@ -18,11 +18,10 @@ def analyze_diff(diff):
 
     Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message.
     """
-    return call_api(url, headers, meta_prompt)
+    return call_api(config.OLLAMA_URL, headers, meta_prompt)
 
 
 def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, long=True):
-    url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
     commit_message_prompt = f"""Please generate 5 concise git commit message examples for the following diff, following the conventional commit format.
 
@@ -63,11 +62,10 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
         """
     commit_message_prompt += f"""
     Commit message examples:"""
-    return call_api(url, headers, commit_message_prompt)
+    return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
 
 
 def select_best_commit_message(commit_message_examples, diff_analysis, diff):
-    url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
     selection_prompt = f"""Please select the most appropriate commit message from the following examples:
     {commit_message_examples}
@@ -85,7 +83,8 @@ def select_best_commit_message(commit_message_examples, diff_analysis, diff):
     Important: Provide only the selected commit message, without any additional text, explanations, or reasoning. The response should contain exclusively the chosen commit message.
 
     Commit message:"""
-    return call_api(url, headers, selection_prompt)
+    return call_api(config.OLLAMA_URL, headers, selection_prompt)
+
 
 def generate_commit_message(diff, logging=True, markdown=False):
     try:
