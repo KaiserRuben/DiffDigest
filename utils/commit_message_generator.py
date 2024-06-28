@@ -16,7 +16,7 @@ def analyze_diff(diff):
     Here's the full git diff:
     {diff}
 
-    Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message.
+    Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message. Do not provide an example for the commit message, focus on the analysis.
     """
     return call_api(config.OLLAMA_URL, headers, meta_prompt)
 
