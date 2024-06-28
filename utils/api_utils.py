@@ -1,10 +1,12 @@
 import requests
 
+import config
+
 
 def call_api(url, headers, prompt):
     try:
         response = requests.post(url, headers=headers, json={
-            "model": "llama3:instruct",
+            "model": config.OLLAMA_MODEL,
             "prompt": prompt,
             "stream": False
         })
