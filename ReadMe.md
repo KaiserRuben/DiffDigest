@@ -79,3 +79,6 @@ The Git Commit Message Generator follows these steps:
 
 ## Conclusion
 The Git Commit Message Generator streamlines the process of writing informative and standardized commit messages. By integrating it into your preferred IDE using the provided instructions, you can quickly generate commit messages based on the changes in your Git repository, saving time and ensuring consistency in your commit history.
+
+## License
+This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. To view a copy of this license, visit https://creativecommons.org/licenses/by-nc/4.0/
