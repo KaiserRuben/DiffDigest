@@ -2,6 +2,7 @@ from utils.git_utils import get_last_commit_messages
 from utils.api_utils import call_api
 from utils.string_shenanigans import clean_commit_message
 import config
+import tqdm
 
 
 def analyse_last_commit_messages(history, diff):
@@ -75,30 +76,34 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
 
 def final_generate_message(commit_message_info, long=True):
     headers = {'Content-Type': 'application/json'}
-    commit_message_prompt = f"""Please generate a git commit message based on the following information:
+    commit_message_prompt = f"""
+    Generate a git commit message based on the following information:
 
     {commit_message_info}
 
     Guidelines:
     1. Use the suggested type and scope (if provided).
     2. Keep the summary under 50 characters.
-    3. If the impact is moderate or significant, provide a description in the body.
+    3. If the impact is moderate or significant, provide a description in the body, which may be longer.
     4. If the changes are a continuation of a previous task, consider using phrases like "continued fixing feature x" or "continued refactoring".
-    5. Do not include any additional text, explanations, or backticks.
+    5. Provide only the commit message itself, without any additional text, explanations, or formatting. Never start your answer with "commit message:", "Here is ..." or any other prefix. 
+    6. Start with fest, fix, docs, style, refactor, test, chore, etc.
 
-    Please provide your commit message in the following format:
+    Format:
     """
+
     if long:
         commit_message_prompt += f"""
-        <type>(<optional scope>): <short summary>\n\n
-        <optional body>
-        """
+    <type>(<optional scope>): <short summary>
+
+    <optional body>
+    """
     else:
         commit_message_prompt += f"""
-        <type>(<optional scope>): <short summary>
-        """
-    return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
+    <type>(<optional scope>): <short summary>
+    """
 
+    return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
 
 def generate_commit_message(diff: str, logging: bool = True, markdown: bool = False) -> str:
     """
@@ -113,41 +118,37 @@ def generate_commit_message(diff: str, logging: bool = True, markdown: bool = Fa
         str: The generated commit message or an error message if an exception occurs.
     """
     try:
-        history = get_last_commit_messages()
-        last_commits_summary = analyse_last_commit_messages(history, diff)
-        if logging:
-            print(f"[Last Commit Messages]\n{last_commits_summary}")
+        with tqdm(total=4, desc="Generating Commit Message") as pbar:
+            history = get_last_commit_messages()
+            last_commits_summary = analyse_last_commit_messages(history, diff)
+            if logging:
+                print(f"[Last Commit Messages]\n{last_commits_summary}")
+            pbar.update(1)
+
+            diff_analysis = analyze_diff(diff)
+            if logging:
+                print(f"[Diff Analysis]\n{diff_analysis}")
+            pbar.update(1)
+
+            commit_message_examples = gather_commit_message_info(diff_analysis, diff, last_commits_summary)
+            if logging:
+                print(f"\n[Commit Message Examples]\n{commit_message_examples}")
+            pbar.update(1)
+
+            selected_commit_message = final_generate_message(commit_message_examples)
+            selected_commit_message = clean_commit_message(selected_commit_message)
+            if logging:
+                print(f"\n[Selected Commit Message]\n{selected_commit_message}")
+            pbar.update(1)
+
+            markdown_logs = f"# Diff Analysis\n{diff_analysis}\n\n# Commit Message Examples\n{commit_message_examples}\n\n# Selected Commit Message\n{selected_commit_message}"
+            if markdown:
+                try:
+                    with open("commit_message.md", "w") as f:
+                        f.write(markdown_logs)
+                except Exception as e:
+                    return f"Error: Failed to write markdown logs to file. {str(e)}"
+
+            return selected_commit_message
     except Exception as e:
-        return f"Error: Failed to analyze last commit messages. {str(e)}"
-
-    try:
-        diff_analysis = analyze_diff(diff)
-        if logging:
-            print(f"[Diff Analysis]\n{diff_analysis}")
-    except Exception as e:
-        return f"Error: Failed to analyze diff. {str(e)}"
-
-    try:
-        commit_message_examples = gather_commit_message_info(diff_analysis, diff, last_commits_summary)
-        if logging:
-            print(f"\n[Commit Message Examples]\n{commit_message_examples}")
-    except Exception as e:
-        return f"Error: Failed to generate commit message examples. {str(e)}"
-
-    try:
-        selected_commit_message = final_generate_message(commit_message_examples)
-        selected_commit_message = clean_commit_message(selected_commit_message)
-        if logging:
-            print(f"\n[Selected Commit Message]\n{selected_commit_message}")
-    except Exception as e:
-        return f"Error: Failed to select or clean commit message. {str(e)}"
-
-    markdown_logs = f"# Diff Analysis\n{diff_analysis}\n\n# Commit Message Examples\n{commit_message_examples}\n\n# Selected Commit Message\n{selected_commit_message}"
-    if markdown:
-        try:
-            with open("commit_message.md", "w") as f:
-                f.write(markdown_logs)
-        except Exception as e:
-            return f"Error: Failed to write markdown logs to file. {str(e)}"
-
-    return selected_commit_message
+        return f"Error: Failed to generate commit message. {str(e)}"
