@@ -16,6 +16,22 @@ The Git Commit Message Generator is a Python-based tool that helps developers cr
 - Git installed and accessible from the system PATH
 - Python packages: `requests`, `pyperclip`
 
+### Ollama
+- Install Ollama from the [official website](https://ollama.com/).
+- Pull the Model of your choice using the following command:
+  ```bash
+  ollama pull <model_name>
+  ```
+- Make sure that Ollama is running in the background by executing the following command:
+  ```bash
+  ollama start
+  ```
+  If you get `Error: listen tcp 127.0.0.1:11434: bind: address already in use` it means that Ollama is likely already running.
+
+### Configuration
+- Set the OLLAMA_URL in the config.py file to the URL of the Ollama API. The default value is `http://localhost:11434`.
+- Set the OLLAMA_MODEL in the config.py file to the name of the Ollama model you want to use. The default value is `llama3:instruct`.
+
 ## Usage
 
 1. Stage the changes you want to commit using `git add`.
