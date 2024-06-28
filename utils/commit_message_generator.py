@@ -41,11 +41,14 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     And here's the full git diff for reference:
     {diff}
 
+    Please focus primarily on the diff analysis and the specific changes in the current diff when generating the commit message examples.
+
     For additional context, here's a summary of the last few commit messages:
     {last_commits_summary}
 
-    Please focus primarily on the current diff and its analysis when generating the commit message examples. 
-    Use the last commit messages only for high-level context, but ensure the examples are specific to the current changes.
+    If the current changes are a direct continuation of a previous task or feature mentioned in the last commit messages,
+    you may consider using phrases like "continued fixing feature x" or "continued refactoring" in the commit message examples.
+    However, ensure that the examples still accurately reflect the specific changes in the current diff.
 
     Please provide your commit message examples in the following format:
     """
@@ -62,7 +65,8 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     Commit message examples:"""
     return call_api(url, headers, commit_message_prompt)
 
-def select_best_commit_message(commit_message_examples):
+
+def select_best_commit_message(commit_message_examples, diff_analysis, diff):
     url = "http://localhost:11434/api/generate"
     headers = {'Content-Type': 'application/json'}
     selection_prompt = f"""Please select the most appropriate commit message from the following examples:
@@ -73,11 +77,15 @@ def select_best_commit_message(commit_message_examples):
     2. Clarity and conciseness of the summary.
     3. Relevance to the main changes in the diff.
 
-    Please provide only the selected commit message, without any additional text or explanations.
+    Here's the analysis of the diff:
+    {diff_analysis}
 
-    Selected commit message:"""
+    Please choose the commit message that best summarizes the main changes and their impact, while adhering to the conventional commit format.
+
+    Important: Provide only the selected commit message, without any additional text, explanations, or reasoning. The response should contain exclusively the chosen commit message.
+
+    Commit message:"""
     return call_api(url, headers, selection_prompt)
-
 
 def generate_commit_message(diff, logging=True, markdown=False):
     try:
@@ -87,7 +95,7 @@ def generate_commit_message(diff, logging=True, markdown=False):
         if logging: print(f"[Diff Analysis]\n{diff_analysis}")
         commit_message_examples = generate_commit_message_examples(diff_analysis, diff, last_commits_summary)
         if logging: print(f"\n[Commit Message Examples]\n{commit_message_examples}")
-        selected_commit_message = select_best_commit_message(commit_message_examples)
+        selected_commit_message = select_best_commit_message(commit_message_examples, diff_analysis, diff)
         selected_commit_message = clean_commit_message(selected_commit_message)
         if logging: print(f"\n[Selected Commit Message]\n{selected_commit_message}")
         markdown_logs = f"# Diff Analysis\n{diff_analysis}\n\n# Commit Message Examples\n{commit_message_examples}\n\n# Selected Commit Message\n{selected_commit_message}"
