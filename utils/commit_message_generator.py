@@ -65,7 +65,7 @@ def generate_commit_message_examples(diff_analysis, diff, last_commits_summary, 
     return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
 
 
-def select_best_commit_message(commit_message_examples, diff_analysis, diff):
+def select_best_commit_message(commit_message_examples, diff):
     headers = {'Content-Type': 'application/json'}
     selection_prompt = f"""Please select the most appropriate commit message from the following examples:
     {commit_message_examples}
@@ -76,7 +76,7 @@ def select_best_commit_message(commit_message_examples, diff_analysis, diff):
     3. Relevance to the main changes in the diff.
 
     Here's the analysis of the diff:
-    {diff_analysis}
+    {diff}
 
     Please choose the commit message that best summarizes the main changes and their impact, while adhering to the conventional commit format.
 
@@ -94,7 +94,7 @@ def generate_commit_message(diff, logging=True, markdown=False):
         if logging: print(f"[Diff Analysis]\n{diff_analysis}")
         commit_message_examples = generate_commit_message_examples(diff_analysis, diff, last_commits_summary)
         if logging: print(f"\n[Commit Message Examples]\n{commit_message_examples}")
-        selected_commit_message = select_best_commit_message(commit_message_examples, diff_analysis, diff)
+        selected_commit_message = select_best_commit_message(commit_message_examples, diff)
         selected_commit_message = clean_commit_message(selected_commit_message)
         if logging: print(f"\n[Selected Commit Message]\n{selected_commit_message}")
         markdown_logs = f"# Diff Analysis\n{diff_analysis}\n\n# Commit Message Examples\n{commit_message_examples}\n\n# Selected Commit Message\n{selected_commit_message}"
