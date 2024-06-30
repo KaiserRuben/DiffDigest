@@ -2,7 +2,7 @@ from utils.git_utils import get_last_commit_messages
 from utils.api_utils import call_api
 from utils.string_shenanigans import clean_commit_message
 import config
-import tqdm
+from tqdm import tqdm
 
 
 def analyse_last_commit_messages(history, diff):
@@ -104,6 +104,7 @@ def final_generate_message(commit_message_info, long=True):
     """
 
     return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
+
 
 def generate_commit_message(diff: str, logging: bool = True, markdown: bool = False) -> str:
     """
