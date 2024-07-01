@@ -83,6 +83,7 @@ def final_generate_message(commit_message_info, long=True):
     4. If the changes are a continuation of a previous task, consider using phrases like "continued fixing feature x" or "continued refactoring".
     5. Provide only the commit message itself, without any additional text, explanations, or formatting. Never start your answer with "commit message:", "Here is ..." or any other prefix. 
     6. Start with fest, fix, docs, style, refactor, test, chore, etc.
+    7. do not use new lines in the commit message, separate with spaces.
 
     Format:
     """
