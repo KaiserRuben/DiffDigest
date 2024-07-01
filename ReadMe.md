@@ -1,13 +1,13 @@
 # DiffDigest: Git Commit Message Generator
 
-The Git Commit Message Generator is a Python-based tool that helps developers create meaningful and standardized commit messages based on the changes in their Git repository. It analyzes the Git diff, generates commit message examples, and selects the most appropriate message for the user to use.
+The Git Commit Message Generator is a Python-based tool that helps developers create meaningful and standardized commit messages based on the changes in a Git repository. It analyzes the Git diff, refines the important info, and generates the most appropriate message based on that information.
 
 ## Features
 
 - Retrieves the Git diff of the staged changes
 - Analyzes the diff to provide a summary of the affected areas, notable modifications, and potential impact
-- Generates commit message examples following the conventional commit format
-- Selects the most appropriate commit message based on relevance and clarity
+- Refines the important information
+- Generates a commit message following the conventional commit format
 - Copies the selected commit message to the clipboard for easy pasting into the commit message field
 - Supports multiple LLM providers for flexible and powerful language processing
 
@@ -82,8 +82,8 @@ Uncomment the line for your preferred service and ensure the necessary environme
 
 1. Stage the changes you want to commit using `git add`.
 2. Run the `main.py` script using Python.
-3. The tool will analyze the Git diff, generate commit message examples, and select the most appropriate one.
-4. The selected commit message will be copied to your clipboard.
+3. The tool will analyze the Git diff, generate commit message info, and come up with a commit message.
+4. The commit message will be copied to your clipboard.
 5. Paste the commit message into your Git client's commit message field and proceed with the commit.
 
 ## Q&A
@@ -94,10 +94,10 @@ The Git Commit Message Generator follows these steps:
 
 1. Retrieves the Git diff of the staged changes using the `git diff --cached` command.
 2. Analyzes the diff to provide a summary of the affected areas, notable modifications, and potential impact using an AI-powered API.
-3. Generates commit message examples following the conventional commit format, considering the diff analysis and the last few commit messages for context.
-4. Selects the most appropriate commit message based on relevance and clarity using the AI-powered API.
+3. Generates commit message info following the conventional commit format, considering the diff analysis and the last few commit messages for context.
+4. Generates a commit message based on the collected information using the AI-powered API.
 5. Cleans up the selected commit message by removing any unwanted characters or formatting.
-6. Copies the selected commit message to the clipboard for easy pasting into the commit message field.
+6. Copies the commit message to the clipboard for easy pasting into the commit message field.
 
 ### How can I integrate the Git Commit Message Generator into my JetBrains IDE (PyCharm, IntelliJ IDEA, etc.)?
 
