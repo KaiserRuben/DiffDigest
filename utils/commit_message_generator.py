@@ -42,9 +42,10 @@ def analyze_diff(diff):
 
 
 def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
-    info_gathering_prompt = f"""Please provide the following information to help generate a commit message:
+    info_gathering_prompt = f"""You are an AI assistant designed to help developers generate meaningful git commit messages.
+    Please provide the following information to help generate a commit message:
 
-    1. Main changes: Briefly summarize the main changes in the diff. Make sure to include all relevant changes. Summarize smaller changes and list larger changes.
+    1. Main changes: Briefly summarize the changes in the diff. Make sure to include all relevant changes. Summarize smaller changes and list larger changes. Be specific and concise.
     2. Impact: Assess the potential impact of these changes (minor, moderate, or significant).
     3. Type: Suggest the most appropriate commit type (feat, fix, docs, style, refactor, test, chore).
     4. Scope: If applicable, suggest a scope for the commit (e.g., component or module name).
@@ -61,7 +62,7 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
     {last_commits_summary}
 
     Please provide the information in the following format:
-    Main changes: <brief summary>
+    Changes: <brief summary>
     Impact: <minor/moderate/significant>
     Type: <type>
     Scope: <optional scope>
@@ -118,7 +119,7 @@ def generate_commit_message(diff: str, logging: bool = True, markdown: bool = Fa
         str: The generated commit message or an error message if an exception occurs.
     """
     if logging:
-        print(f"Generating commit message for the following diff...")
+        print(f"Generating commit message...")
     try:
         history = get_last_commit_messages()
         last_commits_summary = analyse_last_commit_messages(history, diff)

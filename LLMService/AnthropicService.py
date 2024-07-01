@@ -24,7 +24,7 @@ class AnthropicService(BaseLLMService):
                     "content": [{"type": "text", "text": prompt}]
                 }],
                 model=self.model,
-                max_tokens=100,
+                max_tokens=1000,
             )
             return response.content[0].text.strip()
         except Exception as e:
