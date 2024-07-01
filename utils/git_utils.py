@@ -2,6 +2,8 @@ import os
 import subprocess
 import logging
 
+import config
+
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -23,7 +25,7 @@ def get_git_diff():
         return "Error: Git is not installed or not in the system PATH."
 
 
-def get_last_commit_messages(num_commits=10):
+def get_last_commit_messages(num_commits=config.MAX_COMMITS):
     try:
         output = subprocess.check_output(["git", "log", f"-p", f"-n{num_commits}"], text=True)
         commit_messages = output.strip().split("\n")

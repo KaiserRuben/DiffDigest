@@ -18,3 +18,7 @@ ANTHROPIC_MODEL = "claude-3-5-sonnet-20240620"
 # LLM_SERVICE = OLLAMAService(OLLAMA_URL, OLLAMA_MODEL)
 # LLM_SERVICE = OpenAIService(OPENAI_API_KEY, OPENAI_MODEL)
 LLM_SERVICE = AnthropicService(ANTHROPIC_API_KEY, ANTHROPIC_MODEL)
+
+
+# The maximum number of old commits taken into account for the analysis (default: 10)
+MAX_COMMITS = 10
