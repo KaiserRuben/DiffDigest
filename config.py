@@ -21,4 +21,4 @@ LLM_SERVICE = AnthropicService(ANTHROPIC_API_KEY, ANTHROPIC_MODEL)
 
 
 # The maximum number of old commits taken into account for the analysis (default: 10)
-MAX_COMMITS = 10
+MAX_COMMITS = 50
