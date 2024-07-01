@@ -2,6 +2,7 @@
 from abc import ABC, abstractmethod
 from typing import Dict
 
+
 class BaseLLMService(ABC):
     @abstractmethod
     def get_model_name(self) -> str:
@@ -12,5 +13,5 @@ class BaseLLMService(ABC):
         pass
 
     @abstractmethod
-    def generate(self, prompt: str) -> Dict[str, str]:
+    def generate(self, prompt: str) -> str:
         pass

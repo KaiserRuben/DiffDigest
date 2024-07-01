@@ -15,7 +15,7 @@ class OpenAIService(BaseLLMService):
     def get_url(self) -> str:
         return "-"
 
-    def generate(self, prompt: str) -> Dict[str, str]:
+    def generate(self, prompt: str) -> str:
         try:
             response = openai.Completion.create(
                 engine=self.model,
@@ -25,6 +25,6 @@ class OpenAIService(BaseLLMService):
                 stop=None,
                 temperature=0.7,
             )
-            return {"response": response.choices[0].text.strip()}
+            return response.choices[0].text.strip()
         except openai.error.APIError as e:
             raise Exception(f"Error: Failed to call OpenAI API. {str(e)}")

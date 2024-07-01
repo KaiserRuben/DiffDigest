@@ -16,13 +16,16 @@ class AnthropicService(BaseLLMService):
     def get_url(self) -> str:
         return "-"
 
-    def generate(self, prompt: str) -> Dict[str, str]:
+    def generate(self, prompt: str) -> str:
         try:
-            response = self.client.completions.create(
-                prompt=prompt,
+            response = self.client.messages.create(
+                messages=[{
+                    "role": "user",
+                    "content": [{"type": "text", "text": prompt}]
+                }],
                 model=self.model,
-                max_tokens_to_sample=100,
+                max_tokens=100,
             )
-            return {"response": response.completion.strip()}
+            return response.content[0].text.strip()
         except Exception as e:
             raise Exception(f"Error: Failed to call Anthropic API. {str(e)}")

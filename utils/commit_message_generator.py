@@ -1,12 +1,10 @@
 from utils.git_utils import get_last_commit_messages
 from utils.api_utils import call_api
 from utils.string_shenanigans import clean_commit_message
-import config
 from tqdm import tqdm
 
 
 def analyse_last_commit_messages(history, diff):
-    headers = {'Content-Type': 'application/json'}
     last_commits_prompt = """
     Given a git history and a git diff, analyse the history of the now changed code.
     Highlighting the most significant relationships and insights between the commits and the given change.
@@ -24,11 +22,10 @@ def analyse_last_commit_messages(history, diff):
     [/DATA]
     """
 
-    return call_api(config.OLLAMA_URL, headers, last_commits_prompt)
+    return call_api(last_commits_prompt)
 
 
 def analyze_diff(diff):
-    headers = {'Content-Type': 'application/json'}
     meta_prompt = f"""You are an AI assistant skilled in analyzing git diffs and providing context for commit message generation.
     Please analyze the following git diff and provide a summary of the changes, including:
     1. The main areas of the code that are affected by the changes.
@@ -42,11 +39,10 @@ def analyze_diff(diff):
 
     Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message that includes all relevant aspects. Do not provide an example for the commit message, focus on the analysis.
     """
-    return call_api(config.OLLAMA_URL, headers, meta_prompt)
+    return call_api(meta_prompt)
 
 
 def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
-    headers = {'Content-Type': 'application/json'}
     info_gathering_prompt = f"""Please provide the following information to help generate a commit message:
 
     1. Main changes: Briefly summarize the main changes in the diff.
@@ -71,11 +67,10 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
     Scope: <optional scope>
     Continuation: <yes/no>
     """
-    return call_api(config.OLLAMA_URL, headers, info_gathering_prompt)
+    return call_api(info_gathering_prompt)
 
 
 def final_generate_message(commit_message_info, long=True):
-    headers = {'Content-Type': 'application/json'}
     commit_message_prompt = f"""
     Generate a git commit message based on the following information:
 
@@ -103,7 +98,7 @@ def final_generate_message(commit_message_info, long=True):
     <type>(<optional scope>): <short summary>
     """
 
-    return call_api(config.OLLAMA_URL, headers, commit_message_prompt)
+    return call_api(commit_message_prompt)
 
 
 def generate_commit_message(diff: str, logging: bool = True, markdown: bool = False) -> str:

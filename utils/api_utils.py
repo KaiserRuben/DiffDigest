@@ -2,15 +2,14 @@ import requests
 
 import config
 
+from LLMService.LLMServiceStrategy import LLMServiceStrategy
+from config import LLM_SERVICE
 
-def call_api(url, headers, prompt):
+
+def call_api(prompt):
+    llm_strategy = LLMServiceStrategy(LLM_SERVICE)
     try:
-        response = requests.post(url, headers=headers, json={
-            "model": config.OLLAMA_MODEL,
-            "prompt": prompt,
-            "stream": False
-        })
-        response.raise_for_status()
-        return response.json()['response'].strip()
+        response = llm_strategy.generate(prompt)
+        return response.strip()
     except requests.RequestException as e:
         raise Exception(f"Error: Failed to call API. {str(e)}")
