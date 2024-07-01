@@ -4,6 +4,7 @@ from typing import Dict
 
 from LLMService.BaseLLMService import BaseLLMService
 
+
 class OpenAIService(BaseLLMService):
     def __init__(self, api_key: str, model: str):
         openai.api_key = api_key
@@ -17,14 +18,13 @@ class OpenAIService(BaseLLMService):
 
     def generate(self, prompt: str) -> str:
         try:
-            response = openai.Completion.create(
-                engine=self.model,
-                prompt=prompt,
-                max_tokens=100,
-                n=1,
-                stop=None,
-                temperature=0.7,
+            response = openai.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "user",
+                     "content": prompt}
+                ]
             )
-            return response.choices[0].text.strip()
-        except openai.error.APIError as e:
+            return response.choices[0].message.content
+        except Exception as e:
             raise Exception(f"Error: Failed to call OpenAI API. {str(e)}")

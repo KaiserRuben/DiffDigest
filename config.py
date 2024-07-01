@@ -8,7 +8,7 @@ from LLMService.AnthropicService import AnthropicService
 OLLAMA_URL = "http://localhost:11434"
 OLLAMA_MODEL = "llama3:instruct"
 
-# OPENAI_API_KEY =
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = "gpt-4o"
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
