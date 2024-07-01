@@ -49,6 +49,7 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
     3. Type: Suggest the most appropriate commit type (feat, fix, docs, style, refactor, test, chore).
     4. Scope: If applicable, suggest a scope for the commit (e.g., component or module name).
     5. Continuation: Determine if the current changes are a continuation of a previous task or feature mentioned in the last commit messages.
+    6. WIP: Indicate if the changes are a work in progress (WIP) or if the feature is complete. To answer, analyse the code and try to guess whether the changes are complete or not.
 
     Here's the analysis of the diff:
     {diff_analysis}
@@ -65,6 +66,7 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
     Type: <type>
     Scope: <optional scope>
     Continuation: <yes/no>
+    WIP: <yes/no>
     """
     return call_api(info_gathering_prompt)
 
@@ -81,6 +83,7 @@ def final_generate_message(commit_message_info, long=True):
     3. If the impact is moderate or significant, provide a description in the body, which may be longer.
     4. If the changes are basic or simple, you may mention that. Example: "feat: initial basic implementation of feature x".
     5. If the changes are a continuation of a previous task, consider using phrases like "continued fixing feature x" or "continued refactoring".
+    6. If the changes are a work in progress, use "WIP" or "ongoing" in the commit message.
     6. Start with fest, fix, docs, style, refactor, test, chore, etc.
     7. Provide only the commit message itself, without any additional text, explanations, or formatting. 
     Never start your answer with "commit message:", "Here is a generated git commit message..." or any other prefix. Answer with the commit message only. 
