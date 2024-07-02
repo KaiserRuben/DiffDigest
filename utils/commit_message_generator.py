@@ -153,4 +153,6 @@ def generate_commit_message(diff: str, logging: bool = True, markdown: bool = Fa
 
         return selected_commit_message
     except Exception as e:
-        return f"Error: Failed to generate commit message. {str(e)}"
+        if logging:
+            print(f'File: {e.__traceback__.tb_frame.f_globals["__file__"]}, Line: {e.__traceback__.tb_lineno}')
+        return f"Error: Failed to generate commit message. Error: {str(e)}"

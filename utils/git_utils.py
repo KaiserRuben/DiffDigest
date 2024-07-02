@@ -27,7 +27,7 @@ def get_git_diff():
 
 def get_last_commit_messages(num_commits=config.MAX_COMMITS):
     try:
-        output = subprocess.check_output(["git", "log", f"-p", f"-n{num_commits}"], text=True)
+        output = subprocess.check_output(["git", "log", f"-p", f"-n{num_commits}"], encoding='utf-8', errors='replace')
         commit_messages = output.strip().split("\n")
         return "\n".join(commit_messages)
     except subprocess.CalledProcessError as e:
