@@ -85,8 +85,8 @@ def final_generate_message(commit_message_info, long=True):
     4. If the changes are basic or simple, you may mention that. Example: "feat: initial basic implementation of feature x".
     5. If the changes are a continuation of a previous task, consider using phrases like "continued fixing feature x" or "continued refactoring".
     6. If the changes are a work in progress, use "WIP" or "ongoing" in the commit message.
-    6. Start with fest, fix, docs, style, refactor, test, chore, etc.
-    7. Provide only the commit message itself, without any additional text, explanations, or formatting. 
+    7. Start with fest, fix, docs, style, refactor, test, chore, etc.
+    8. Provide only the commit message itself, without any additional text, explanations, or formatting. 
     Never start your answer with "commit message:", "Here is a generated git commit message..." or any other prefix. Answer with the commit message only. 
 
     Format:
@@ -94,13 +94,13 @@ def final_generate_message(commit_message_info, long=True):
 
     if long:
         commit_message_prompt += f"""
-    <type>(<optional scope>): <short summary>
+    <type>(<optional scope>): <short specific summary>
 
     <optional body>
     """
     else:
         commit_message_prompt += f"""
-    <type>(<optional scope>): <short summary>
+    <type>(<optional scope>): <short specific summary>
     """
 
     return call_api(commit_message_prompt)
