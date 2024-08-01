@@ -5,20 +5,18 @@ from utils.string_shenanigans import clean_commit_message
 
 def analyse_last_commit_messages(history, diff):
     last_commits_prompt = """
-    Given a git history and a git diff, analyse the history of the now changed code.
-    Highlighting the most significant relationships and insights between the commits and the given change.
-    If possible, follow the history of the code and explain the changes on the way, inbetween quoting the referenced commit messages.
+    Given a git history and a git diff, analyse the history of the code and compare it to its current state.
+    Highlighting the most significant relationships and insights between the commits and the current state.
         """
 
     last_commits_prompt += f"""
-    \n\n[DATA]
+    \n\n
     [HISTORY]
     {history}
     [/HISTORY]\n\n
     [DIFF]
     {diff}
     [/DIFF]
-    [/DATA]
     """
 
     return call_api(last_commits_prompt)
@@ -32,16 +30,17 @@ def analyze_diff(diff):
     3. Any notable modifications or additions to the code.
     4. Potential impact of the changes on the overall functionality. 
     5. If there is a large change, highlight its importance and explain it. Then add the recommendation to include it in the commit message.
+    Be concise and specific.
+
+    Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message that includes all relevant aspects. Do not provide an example for the commit message, focus on the analysis.
 
     Here's the full git diff:
     {diff}
-
-    Please provide your analysis as a concise summary, focusing on the most relevant information for generating a meaningful commit message that includes all relevant aspects. Do not provide an example for the commit message, focus on the analysis.
     """
     return call_api(meta_prompt)
 
 
-def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
+def gather_commit_message_info(diff_analysis, diff:str, last_commits_summary:str):
     info_gathering_prompt = f"""You are an AI assistant designed to help developers generate meaningful git commit messages.
     Please provide the following information to help generate a commit message:
 
@@ -51,32 +50,37 @@ def gather_commit_message_info(diff_analysis, diff, last_commits_summary):
     4. Scope: If applicable, suggest a scope for the commit (e.g., component or module name).
     5. Continuation: Determine if the current changes are a continuation of a previous task or feature mentioned in the last commit messages.
     6. WIP: Indicate if the changes are a work in progress (WIP) or if the feature is complete. To answer, analyse the code and try to guess whether the changes are complete or not.
-
-    Here's the analysis of the diff:
-    {diff_analysis}
-
-    And here's the full git diff for reference:
-    {diff}
-
-    For additional context, here's an analysis of the last few commit messages:
-    {last_commits_summary}
-
-    Please provide the information in the following format:
+    Be concise and specific.
+    
+    Provide the information in the following format:
     Changes: <brief summary>
     Impact: <minor/moderate/significant>
     Type: <type>
     Scope: <optional scope>
     Continuation: <yes/no>
     WIP: <yes/no>
+
+    Here's the analysis of the diff:
+    {diff_analysis}
+    """
+    if len(diff) < 0:
+        info_gathering_prompt += f"""
+    And here's the full git diff for reference:
+    {diff}
+    """
+
+    if len(last_commits_summary) < 0:
+        info_gathering_prompt += f"""
+    For additional context, here's an analysis of the last few commit messages:
+    {last_commits_summary}
+
     """
     return call_api(info_gathering_prompt)
 
 
 def final_generate_message(commit_message_info, long=True):
     commit_message_prompt = f"""
-    Generate a git commit message based on the following information:
-
-    {commit_message_info}
+    Generate a git commit message.
 
     Guidelines:
     1. Use the suggested type and scope (if provided).
@@ -85,10 +89,15 @@ def final_generate_message(commit_message_info, long=True):
     4. If the changes are basic or simple, you may mention that. Example: "feat: initial basic implementation of feature x".
     5. If the changes are a continuation of a previous task, consider using phrases like "continued fixing feature x" or "continued refactoring".
     6. If the changes are a work in progress, use "WIP" or "ongoing" in the commit message.
-    7. Start with fest, fix, docs, style, refactor, test, chore, etc.
-    8. Provide only the commit message itself, without any additional text, explanations, or formatting. 
+    7. If the code before is likely not working and the code now fixes it, consider using "fix" as the type.
+    8. Start with fest, fix, docs, style, refactor, test, chore, etc.
+    9. Provide only the commit message itself, without any additional text, explanations, or formatting. 
     Never start your answer with "commit message:", "Here is a generated git commit message..." or any other prefix. Answer with the commit message only. 
+ 
+    Based on the following information:
 
+    {commit_message_info}
+    
     Format:
     """
 
@@ -106,11 +115,12 @@ def final_generate_message(commit_message_info, long=True):
     return call_api(commit_message_prompt)
 
 
-def generate_commit_message(diff: str, logging: bool = True, markdown: bool = False) -> str:
+def generate_commit_message(diff: str, logging: bool = True, markdown: bool = False, add_history=False) -> str:
     """
     Generate a commit message based on the provided diff.
 
     Args:
+        add_history: Whether to include the history analysis in the commit message generation.
         diff (str): The diff string representing the changes.
         logging (bool, optional): Whether to log the process. Defaults to True.
         markdown (bool, optional): Whether to write the logs to a markdown file. Defaults to False.
@@ -122,9 +132,12 @@ def generate_commit_message(diff: str, logging: bool = True, markdown: bool = Fa
         print(f"Generating commit message...")
     try:
         history = get_last_commit_messages()
-        last_commits_summary = analyse_last_commit_messages(history, diff)
-        if logging:
-            print(f"[1/4 : Get & Analyse git history]\n{last_commits_summary}")
+        if add_history:
+            last_commits_summary = analyse_last_commit_messages(history, diff)
+            if logging:
+                print(f"[1/4 : Get & Analyse git history]\n{last_commits_summary}")
+        else:
+            last_commits_summary = ""
 
         diff_analysis = analyze_diff(diff)
         if logging:
