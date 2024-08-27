@@ -80,8 +80,10 @@ def gather_commit_message_info(diff_analysis, diff:str, last_commits_summary:str
 
 def final_generate_message(commit_message_info, long=True):
     commit_message_prompt = f"""
-    Generate a git commit message.
+    Generate a git commit message. Based on the following information:
 
+    {commit_message_info}
+    
     Guidelines:
     1. Use the suggested type and scope (if provided).
     2. Keep the summary under 50 characters.
@@ -94,10 +96,7 @@ def final_generate_message(commit_message_info, long=True):
     9. Provide only the commit message itself, without any additional text, explanations, or formatting. 
     Never start your answer with "commit message:", "Here is a generated git commit message..." or any other prefix. Answer with the commit message only. 
  
-    Based on the following information:
 
-    {commit_message_info}
-    
     Format:
     """
 
